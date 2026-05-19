@@ -58,7 +58,7 @@ async function run() {
 
     // ─── AUTH ROUTES ─────────────────────────────────────────────
 
-   // JWT generate - localhost এর জন্য fix
+   // JWT generate - localhost  fix
 app.post("/jwt", (req, res) => {
   const user = req.body;
   const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "7d" });
