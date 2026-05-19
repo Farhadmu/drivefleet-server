@@ -11,9 +11,11 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(
   cors({
-    origin: function (origin, callback) {
-      callback(null, true);
-    },
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "https://drivefleet-client-kappa.vercel.app",
+    ],
     credentials: true,
   })
 );
@@ -56,29 +58,30 @@ async function run() {
 
     // ─── AUTH ROUTES ─────────────────────────────────────────────
 
-    // Generate JWT Token
-    app.post("/jwt", (req, res) => {
-      const user = req.body;
-      const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "7d" });
-      res
-        .cookie("token", token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-        })
-        .json({ success: true });
-    });
+   // JWT generate - localhost এর জন্য fix
+app.post("/jwt", (req, res) => {
+  const user = req.body;
+  const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "7d" });
 
-    // Clear JWT Token (Logout)
-    app.post("/logout", (req, res) => {
-      res
-        .clearCookie("token", {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-        })
-        .json({ success: true });
-    });
+  res.cookie("token", token, {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+})
+    .json({ success: true });
+});
+
+// Logout
+app.post("/logout", (req, res) => {
+  
+ res.clearCookie("token", {
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+})
+    .json({ success: true });
+});
+
 
     // ─── CARS ROUTES ─────────────────────────────────────────────
 
@@ -207,7 +210,6 @@ async function run() {
         };
         const result = await bookingsCollection.insertOne(booking);
 
-        // Increment booking count using $inc
         await carsCollection.updateOne(
           { _id: new ObjectId(booking.carId) },
           { $inc: { bookingCount: 1 } }
@@ -226,7 +228,6 @@ async function run() {
         const booking = await bookingsCollection.findOne({ _id: new ObjectId(id) });
         const result = await bookingsCollection.deleteOne({ _id: new ObjectId(id) });
 
-        // Decrement booking count
         if (booking) {
           await carsCollection.updateOne(
             { _id: new ObjectId(booking.carId) },
