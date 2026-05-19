@@ -11,11 +11,9 @@ const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:3000",
-      "https://drivefleet-client.vercel.app",
-    ],
+    origin: function (origin, callback) {
+      callback(null, true);
+    },
     credentials: true,
   })
 );
