@@ -13,7 +13,7 @@ Backend API for the DriveFleet Car Rental Platform.
 
 ```
 PORT=5000
-MONGODB_URI=your_mongodb_connection_string
+MONGODB_URI= my_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
 NODE_ENV=development
 ```
